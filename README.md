@@ -8,6 +8,8 @@
 
 [下载最新版](https://github.com/CG1995/groundcat-format/releases/latest) · [问题反馈](https://github.com/CG1995/groundcat-format/issues)
 
+![走地猫 v0.1.0 极简格式转换界面](docs/assets/groundcat-v0.1.0.png)
+
 ## 致敬与来源
 
 走地猫基于 [LaoFeng-mouse/flyingmouse-format](https://github.com/LaoFeng-mouse/flyingmouse-format) 的 **FlyingMouse Format v0.5.0** 改造而来。
