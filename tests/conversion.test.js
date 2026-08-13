@@ -473,7 +473,7 @@ test("rejects an unknown target with a stable error code", async () => {
   assert.strictEqual(body.errorCode, "UNSUPPORTED_TARGET");
 });
 
-test("renders PDF pages to a PNG zip without changing the source PDF", async () => {
+test("renders a single-page PDF directly to PNG without changing the source PDF", async () => {
   const sourcePath = path.join(scratchRoot, "报价单.pdf");
   await createTextPdf(sourcePath);
   const beforeHash = hashFile(sourcePath);
@@ -481,13 +481,13 @@ test("renders PDF pages to a PNG zip without changing the source PDF", async () 
   const { response, body } = await uploadConvert(sourcePath, "报价单.pdf", "png", "application/pdf");
 
   assert.strictEqual(response.status, 200, body.error);
-  assert.strictEqual(body.fileName, "报价单.png.zip");
-  const outputPath = await downloadResult(body, "pdf-pages.zip");
-  assertZipWithEntry(outputPath, /page-001\.png/);
+  assert.strictEqual(body.fileName, "报价单.png");
+  const outputPath = await downloadResult(body, "报价单.png");
+  assert.strictEqual((await sharp(outputPath).metadata()).format, "png");
   assert.strictEqual(hashFile(sourcePath), beforeHash);
 });
 
-test("renders PDF pages to a JPG zip without changing the source PDF", async () => {
+test("renders a single-page PDF directly to JPG without changing the source PDF", async () => {
   const sourcePath = path.join(scratchRoot, "picture-export.pdf");
   await createTextPdf(sourcePath);
   const beforeHash = hashFile(sourcePath);
@@ -495,9 +495,9 @@ test("renders PDF pages to a JPG zip without changing the source PDF", async () 
   const { response, body } = await uploadConvert(sourcePath, "picture-export.pdf", "jpg", "application/pdf");
 
   assert.strictEqual(response.status, 200, body.error);
-  assert.strictEqual(body.fileName, "picture-export.jpg.zip");
-  const outputPath = await downloadResult(body, "pdf-pages-jpg.zip");
-  assertZipWithEntry(outputPath, /page-001\.jpg/);
+  assert.strictEqual(body.fileName, "picture-export.jpg");
+  const outputPath = await downloadResult(body, "picture-export.jpg");
+  assert.strictEqual((await sharp(outputPath).metadata()).format, "jpeg");
   assert.strictEqual(hashFile(sourcePath), beforeHash);
 });
 

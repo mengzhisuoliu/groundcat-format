@@ -309,7 +309,7 @@ async function writePdfTableWorkbook(model, outputPath) {
   const workbook = new ExcelJS.Workbook();
   const explanation = workbook.addWorksheet("识别说明");
   explanation.addRows([
-    ["FlyingMouse PDF → Excel 智能表格提取 / Smart table extraction"],
+    ["GroundCat PDF → Excel 智能表格提取 / Smart table extraction"],
     ["页码 / Page", "来源 / Source", "表格数 / Tables", "置信度 / Confidence", "警告 / Warnings"],
     ...(model.summary || []).map((entry) => [
       entry.pageNumber,

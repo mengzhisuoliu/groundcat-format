@@ -276,6 +276,22 @@ test("trusted IPC owns durable renderer settings", () => {
   assert.match(preload, /migrateLegacySettings/);
 });
 
+test("desktop outputs are saved beside a real source file and only generated files can be revealed", () => {
+  const main = readRoot("electron-main.js");
+  const preload = readRoot("preload.js");
+  const outputSave = readRoot("output-save.js");
+  assert.match(preload, /webUtils\.getPathForFile/);
+  assert.match(preload, /save-converted-file-next-to-source/);
+  assert.match(preload, /reveal-converted-file/);
+  assert.match(main, /ipcMain\.handle\("save-converted-file-next-to-source"/);
+  assert.match(main, /saveDownloadedNextToSource\(savePayload, downloadToFile\)/);
+  assert.match(outputSave, /path\.isAbsolute\(rawSourcePath\)/);
+  assert.match(outputSave, /sourceStat\.isFile\(\)/);
+  assert.match(outputSave, /uniqueDestination\(directory, fileName\)/);
+  assert.match(main, /savedOutputPaths\.has\(filePath\)/);
+  assert.match(main, /shell\.showItemInFolder\(filePath\)/);
+});
+
 test("trusted IPC exports a sanitized diagnostics report to the remembered directory", () => {
   const packageJson = JSON.parse(readRoot("package.json"));
   const main = readRoot("electron-main.js");

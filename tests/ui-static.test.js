@@ -4,45 +4,60 @@ const path = require("path");
 const { test } = require("node:test");
 
 const publicRoot = path.join(__dirname, "..", "public");
+const projectRoot = path.join(__dirname, "..");
 
 function readPublic(fileName) {
   return fs.readFileSync(path.join(publicRoot, fileName), "utf8");
 }
 
-test("renderer exposes workflow hooks and drop zone copy", () => {
+test("Windows installer uses an ASCII groundcat folder name", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"));
+  const installer = fs.readFileSync(path.join(projectRoot, "build", "installer.nsh"), "utf8");
+  assert.equal(pkg.build.nsis.include, "build/installer.nsh");
+  assert.match(installer, /!define APP_FILENAME "groundcat"/);
+  assert.match(installer, /\$R8 == "flyingmouse-format"/);
+  assert.match(installer, /\$R8 == "走地猫"/);
+  assert.match(installer, /StrCpy \$INSTDIR "\$R9\\groundcat"/);
+});
+
+test("renderer exposes the essential conversion actions and a result shortcut", () => {
   const html = readPublic("index.html");
-  assert.match(html, /id="workflowSteps"/);
-  for (const step of ["select", "analyze", "convert", "save"]) {
-    assert.match(html, new RegExp(`data-step="${step}"`), `${step} workflow step is missing`);
-  }
   assert.match(html, /id="dropZone"/);
-  assert.match(html, /把文件丢给鼠鼠|Drop files here/);
-  assert.match(html, /id="dropHint"/);
+  assert.match(html, /id="targetSelect"/);
+  assert.match(html, /id="convertButton"/);
+  assert.match(html, /id="openOutputButton"[^>]*hidden/);
+  assert.doesNotMatch(html, /id="workflowSteps"|formatTable|trust-list|cat-mascot|sponsorWidget/);
 });
 
-test("renderer restores the original mouse mascot and sponsor widget", () => {
-  const html = readPublic("index.html");
+test("desktop conversion saves beside the source and reveals the generated file", () => {
   const app = readPublic("app.js");
-  assert.match(html, /mouse-mascot|mouseMascot/);
-  assert.match(html, /sponsorWidget/);
-  assert.match(app, /setMouseState|mouseAssets|mouseMascot/);
+  assert.match(app, /getSourcePath\?\.\(file\)/);
+  assert.match(app, /saveConvertedFileNextToSource/);
+  assert.match(app, /result\.savedFilePath = saved\.filePath/);
+  assert.match(app, /revealConvertedFile\(filePath\)/);
+  assert.match(app, /已保存到源文件目录/);
 });
 
-test("renderer uses the mouse brand and favicon", () => {
+test("renderer keeps the GroundCat brand out of the conversion surface", () => {
   const html = readPublic("index.html");
-  assert.match(html, /class="brand-mouse"/);
-  assert.match(html, /rel="icon"/);
-  assert.match(html, /href="\/assets\/mouse-format\/mouse-idle\.png"/);
+  assert.match(html, />走地猫</);
+  assert.doesNotMatch(html, /mouseMascot|ground-cat-logo\.svg[^>]+class=|sponsorWidget|sponsor-qr/);
 });
 
-test("original mouse visual theme classes are present", () => {
+test("renderer uses the GroundCat SVG only as its favicon", () => {
+  const html = readPublic("index.html");
+  assert.match(html, /rel="icon"/);
+  assert.match(html, /href="\/assets\/ground-cat\/ground-cat-logo\.svg"/);
+});
+
+test("minimal visual theme matches the restrained reference language", () => {
   const css = readPublic("styles.css");
-  assert.match(css, /--accent:\s*#e95f6d/);
-  assert.match(css, /\.workflow-steps/);
-  assert.match(css, /\.mouse-stage/);
-  assert.match(css, /\.mouse-mascot/);
-  assert.match(css, /\.sponsor-widget/);
-  assert.match(css, /border-radius:\s*var\(--radius\)/);
+  assert.match(css, /--paper:\s*#f2efe7/);
+  assert.match(css, /--blue:\s*#3f62ff/);
+  assert.match(css, /border-radius:\s*0/);
+  assert.doesNotMatch(css, /box-shadow:\s*(?!none)/);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(css, /@media \(max-width: 480px\)/);
 });
 
 test("renderer exposes a bilingual language selector", () => {
@@ -70,10 +85,10 @@ test("renderer restores and updates target preferences through durable Electron 
   assert.doesNotMatch(app, /rememberTarget\(localStorage/);
 });
 
-test("renderer exposes a bilingual diagnostics export through the trusted bridge", () => {
+test("renderer keeps diagnostics support off the primary interface", () => {
   const html = readPublic("index.html");
   const app = readPublic("app.js");
-  assert.match(html, /id="diagnosticsButton"/);
+  assert.doesNotMatch(html, /id="diagnosticsButton"/);
   assert.match(app, /"diagnostics\.export": "导出诊断"/);
   assert.match(app, /"diagnostics\.export": "Export diagnostics"/);
   assert.match(app, /logBridge\.exportDiagnostics/);
@@ -106,10 +121,10 @@ test("video targets expose a codec selector (h264/h265/av1) for mp4/mov/mkv", ()
   assert.match(app, /form\.append\("videoCodec"/);
 });
 
-test("update entry is hidden by default and revealed only on update-available", () => {
+test("update plumbing is retained without adding an interface control", () => {
   const html = readPublic("index.html");
   const app = readPublic("app.js");
-  assert.match(html, /id="updateButton"[^>]*hidden/);
+  assert.doesNotMatch(html, /id="updateButton"/);
   assert.match(app, /kind === "available" \|\| kind === "downloaded"/);
   assert.match(app, /updateButton\.hidden = false/);
 });

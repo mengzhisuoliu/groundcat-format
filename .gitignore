@@ -2,6 +2,7 @@ node_modules/
 .worktrees/
 runtime/
 dist/
+dist-build-*.log
 test-results/
 output/
 .playwright-cli/

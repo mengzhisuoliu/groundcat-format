@@ -1,0 +1,11 @@
+allowBuilds:
+  electron-winstaller: false
+  tesseract.js: false
+onlyBuiltDependencies:
+  - electron
+ignoredBuiltDependencies:
+  - electron-winstaller
+  - tesseract.js
+nodeLinker: hoisted
+overrides:
+  uuid: ^11.1.1

@@ -1,23 +1,26 @@
 {
   "name": "flyingmouse-format",
-  "version": "0.5.0",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.19.0",
   "private": true,
-  "author": "LaoFeng",
-  "productName": "FlyingMouse Format",
+  "author": "CG1995 (based on FlyingMouse Format by LaoFeng)",
+  "productName": "走地猫",
   "engines": {
     "node": ">=18"
   },
-  "description": "Windows desktop universal file format converter (offline, bundled FFmpeg/LibreOffice/Poppler/Tesseract).",
+  "description": "走地猫离线文件格式转换器（内置 FFmpeg/LibreOffice/Poppler/Tesseract）。",
   "main": "electron-main.js",
   "scripts": {
     "start": "node server.js",
     "desktop": "electron .",
+    "assets:brand": "node scripts/build-ground-cat-assets.js",
+    "predist": "npm run assets:brand",
     "dist": "electron-builder --win nsis --publish never",
     "dist:mac:arm64": "node scripts/validate-ci-engines.js --platform darwin --arch arm64 --root bin/engines/darwin-arm64 && electron-builder --mac dmg --arm64 --publish never",
     "dist:mac:x64": "node scripts/validate-ci-engines.js --platform darwin --arch x64 --root bin/engines/darwin-x64 && electron-builder --mac dmg --x64 --publish never",
     "dist:win7": "node scripts/build-win7.js",
-    "test": "node --test tests/runtime-paths.test.js tests/raw-input.test.js tests/macos-packaging.test.js tests/image-conversion.test.js tests/av3a-format.test.js tests/ncm-metadata.test.js tests/ci-engine-release.test.js tests/conversion-preferences.test.js tests/i18n.test.js tests/settings-store.test.js tests/office-engine.test.js tests/office-quality.test.js tests/office-wps-repair.test.js tests/diagnostics.test.js tests/conversion.test.js tests/electron-hardening-static.test.js tests/electron-security.test.js tests/logger.test.js tests/mouse-assets.test.js tests/pdf-table-extractor.test.js tests/pdf-table-runtime.test.js tests/resource-policy.test.js tests/text-conversion.test.js tests/text-conversion-integration.test.js tests/ui-static.test.js tests/win7-build-profile.test.js tests/win7-build-script.test.js tests/pe-metadata.test.js tests/bmp-input.test.js tests/xml-json.test.js tests/mflac-format.test.js tests/kgma-format.test.js tests/media-codec.test.js tests/pdf2docx.test.js tests/ebook.test.js",
-    "test:ci": "node --test tests/runtime-paths.test.js tests/raw-input.test.js tests/macos-packaging.test.js tests/image-conversion.test.js tests/av3a-format.test.js tests/ncm-metadata.test.js tests/ci-engine-release.test.js tests/conversion-preferences.test.js tests/i18n.test.js tests/settings-store.test.js tests/office-engine.test.js tests/office-quality.test.js tests/office-wps-repair.test.js tests/diagnostics.test.js tests/electron-hardening-static.test.js tests/electron-security.test.js tests/logger.test.js tests/mouse-assets.test.js tests/pdf-table-extractor.test.js tests/pdf-table-runtime.test.js tests/resource-policy.test.js tests/text-conversion.test.js tests/text-conversion-integration.test.js tests/ui-static.test.js tests/win7-build-profile.test.js tests/win7-build-script.test.js tests/pe-metadata.test.js tests/bmp-input.test.js tests/xml-json.test.js tests/mflac-format.test.js tests/kgma-format.test.js tests/media-codec.test.js tests/pdf2docx.test.js tests/ebook.test.js"
+    "test": "node --test tests/runtime-paths.test.js tests/raw-input.test.js tests/image-conversion.test.js tests/av3a-format.test.js tests/ncm-metadata.test.js tests/conversion-preferences.test.js tests/i18n.test.js tests/settings-store.test.js tests/office-engine.test.js tests/office-quality.test.js tests/office-wps-repair.test.js tests/diagnostics.test.js tests/conversion.test.js tests/electron-hardening-static.test.js tests/electron-security.test.js tests/logger.test.js tests/mouse-assets.test.js tests/output-save.test.js tests/pdf-table-extractor.test.js tests/pdf-table-runtime.test.js tests/resource-policy.test.js tests/text-conversion.test.js tests/text-conversion-integration.test.js tests/ui-static.test.js tests/win7-build-profile.test.js tests/win7-build-script.test.js tests/pe-metadata.test.js tests/bmp-input.test.js tests/xml-json.test.js tests/mflac-format.test.js tests/kgma-format.test.js tests/media-codec.test.js tests/pdf2docx.test.js tests/ebook.test.js",
+    "test:ci": "node --test tests/runtime-paths.test.js tests/raw-input.test.js tests/image-conversion.test.js tests/av3a-format.test.js tests/ncm-metadata.test.js tests/conversion-preferences.test.js tests/i18n.test.js tests/settings-store.test.js tests/office-engine.test.js tests/office-quality.test.js tests/office-wps-repair.test.js tests/diagnostics.test.js tests/electron-hardening-static.test.js tests/electron-security.test.js tests/logger.test.js tests/mouse-assets.test.js tests/output-save.test.js tests/pdf-table-extractor.test.js tests/pdf-table-runtime.test.js tests/resource-policy.test.js tests/text-conversion.test.js tests/text-conversion-integration.test.js tests/ui-static.test.js tests/win7-build-profile.test.js tests/win7-build-script.test.js tests/pe-metadata.test.js tests/bmp-input.test.js tests/xml-json.test.js tests/mflac-format.test.js tests/kgma-format.test.js tests/media-codec.test.js tests/pdf2docx.test.js tests/ebook.test.js"
   },
   "dependencies": {
     "@tesseract.js-data/chi_sim": "^1.0.0",
@@ -50,16 +53,9 @@
     "electron-builder": "^26.15.3"
   },
   "build": {
-    "appId": "com.flyingmouse.format",
-    "productName": "FlyingMouse Format",
+    "appId": "com.groundcat.format",
+    "productName": "走地猫",
     "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "LaoFeng-mouse",
-        "repo": "flyingmouse-format"
-      }
-    ],
     "directories": {
       "output": "dist"
     },
@@ -74,6 +70,7 @@
       "office-quality.js",
       "diagnostics.js",
       "runtime-paths.js",
+      "output-save.js",
       "image-conversion.js",
       "bmp-input.js",
       "xml-json.js",
@@ -152,8 +149,7 @@
         }
       ],
       "target": [
-        "nsis",
-        "appx"
+        "nsis"
       ]
     },
     "mac": {
@@ -189,24 +185,14 @@
         }
       ]
     },
-    "appx": {
-      "applicationId": "FlyingMouseFormat",
-      "identityName": "488B6338.354574AC174AD",
-      "publisher": "CN=56D7A4A1-B653-4162-A5E2-7D9B3F3754AD",
-      "publisherDisplayName": "牢蜂喜欢开飞机",
-      "displayName": "FlyingMouse Format",
-      "languages": [
-        "zh-CN",
-        "en-US"
-      ]
-    },
     "nsis": {
+      "include": "build/installer.nsh",
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "FlyingMouse Format"
+      "shortcutName": "走地猫"
     }
   }
 }

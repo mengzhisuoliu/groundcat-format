@@ -12,6 +12,7 @@ const {
 const logger = require("./logger");
 const { buildDiagnosticsReport } = require("./diagnostics");
 const { resolveRuntimePaths } = require("./runtime-paths");
+const { saveDownloadedNextToSource, uniqueDestination } = require("./output-save");
 const {
   mergeLegacySettings,
   readLastSaveDirectory,
@@ -25,6 +26,7 @@ let server = null;
 let serverUrl = "";
 let serverRuntime = null;
 const settingsPath = path.join(app.getPath("userData"), "settings.json");
+const savedOutputPaths = new Set();
 
 // Route all logging (including from server.js and renderer-forwarded IPC
 // messages) to a single debug.log in the Electron userData directory.
@@ -46,8 +48,8 @@ function createWindow(url) {
     height: 820,
     minWidth: 900,
     minHeight: 640,
-    title: "FlyingMouse Format",
-    backgroundColor: "#f6f3ee",
+    title: "走地猫",
+    backgroundColor: "#161a16",
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
@@ -81,6 +83,9 @@ function pushUpdateStatus(status) {
 }
 
 function setupAutoUpdater() {
+  // 走地猫是独立定制分支，未绑定公开更新源；避免误连原项目 Release。
+  return;
+  /* c8 ignore start */
   if (!app.isPackaged || process.windowsStore) return;
   // mac（github-dmg）：Release 没有 latest-mac.yml 资产，检查更新必 404；不启用
   if (process.platform === "darwin") return;
@@ -116,6 +121,7 @@ function setupAutoUpdater() {
   updater.checkForUpdatesAndNotify().catch((error) => {
     log("Auto-update check failed", error);
   });
+  /* c8 ignore stop */
 }
 
 ipcMain.handle("get-app-version", (event) => {
@@ -160,7 +166,7 @@ async function boot() {
   const started = await serverRuntime.startServer(0);
   server = started.server;
   serverUrl = started.url;
-  console.log(`FlyingMouse Format started at ${started.url}`);
+  console.log(`GroundCat started at ${started.url}`);
   log(`Server started at ${started.url}`);
   setupAutoUpdater();
   createWindow(started.url);
@@ -209,19 +215,6 @@ function trustedDownloadUrl(value) {
   return resolved;
 }
 
-function uniqueDestination(directory, fileName) {
-  const parsed = path.parse(path.basename(fileName || "converted-file"));
-  let candidate = path.join(directory, `${parsed.name}${parsed.ext}`);
-  let counter = 1;
-
-  while (fs.existsSync(candidate)) {
-    candidate = path.join(directory, `${parsed.name} (${counter})${parsed.ext}`);
-    counter += 1;
-  }
-
-  return candidate;
-}
-
 ipcMain.handle("get-settings", async (event) => {
   assertTrustedIpc(event);
   return readSettings(settingsPath);
@@ -249,7 +242,7 @@ ipcMain.handle("export-diagnostics", async (event) => {
   const lastSaveDirectory = await readLastSaveDirectory(settingsPath, app.getPath("downloads"));
   const result = await dialog.showSaveDialog(mainWindow, {
     title: "导出诊断报告 / Export diagnostics",
-    defaultPath: path.join(lastSaveDirectory, "FlyingMouse-Format-diagnostics.txt"),
+    defaultPath: path.join(lastSaveDirectory, "GroundCat-diagnostics.txt"),
     buttonLabel: "保存 / Save"
   });
   if (result.canceled || !result.filePath) return { canceled: true };
@@ -294,6 +287,30 @@ ipcMain.handle("save-converted-file", async (event, payload) => {
   await writeLastSaveDirectory(settingsPath, path.dirname(result.filePath))
     .catch((error) => log("Failed to remember save directory", error));
   return { canceled: false, filePath: result.filePath };
+});
+
+ipcMain.handle("save-converted-file-next-to-source", async (event, payload) => {
+  assertTrustedIpc(event);
+  const savePayload = {
+    sourcePath: payload?.sourcePath,
+    fileName: payload?.fileName,
+    downloadUrl: trustedDownloadUrl(payload?.downloadUrl)
+  };
+  const saved = await saveDownloadedNextToSource(savePayload, downloadToFile);
+  savedOutputPaths.add(saved.filePath);
+  return { canceled: false, ...saved };
+});
+
+ipcMain.handle("reveal-converted-file", async (event, payload) => {
+  assertTrustedIpc(event);
+  const filePath = path.resolve(String(payload?.filePath || ""));
+  if (!savedOutputPaths.has(filePath)) {
+    throw new Error("只能定位本次转换生成的文件。");
+  }
+  const stat = await fs.promises.stat(filePath);
+  if (!stat.isFile()) throw new Error("转换后的文件已被移动或删除。");
+  shell.showItemInFolder(filePath);
+  return { ok: true };
 });
 
 ipcMain.handle("save-converted-files", async (event, payload) => {
@@ -360,7 +377,7 @@ app.disableHardwareAcceleration();
 app.commandLine.appendSwitch("js-flags", "--max-old-space-size=1024");
 
 if (process.platform === "win32") {
-  app.setAppUserModelId("com.flyingmouse.format");
+  app.setAppUserModelId("com.groundcat.format");
 }
 
 process.on("uncaughtException", (error) => log("Uncaught exception", error));

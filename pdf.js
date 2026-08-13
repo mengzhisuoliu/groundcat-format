@@ -69,7 +69,9 @@ async function convertPdf(inputPath, outputPath, target, options = {}) {
   }
 
   if (pdfImageTargets.includes(target)) {
-    await convertPdfPagesToImagesZip(inputPath, outputPath, target);
+    await convertPdfPagesToImagesZip(inputPath, outputPath, target, {
+      singleImagePage: options.singleImagePage === true
+    });
     return;
   }
 
@@ -292,9 +294,13 @@ async function renderPdfPages(inputPath, target = "png", dpi = 150, { ocr = fals
   }
 }
 
-async function convertPdfPagesToImagesZip(inputPath, outputPath, target) {
+async function convertPdfPagesToImagesZip(inputPath, outputPath, target, options = {}) {
   const rendered = await renderPdfPages(inputPath, target, 300);
   try {
+    if (options.singleImagePage && rendered.files.length === 1) {
+      await fsp.copyFile(rendered.files[0], outputPath);
+      return;
+    }
     await zipFiles(
       rendered.files.map((file, index) => ({
         inputPath: file,

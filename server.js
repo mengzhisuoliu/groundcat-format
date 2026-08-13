@@ -484,7 +484,13 @@ app.post("/api/convert", assertLocalWebRequest, upload.single("file"), async (re
     return;
   }
 
-  const outputExt = outputExtFor(category, requestedTarget);
+  let outputExt = outputExtFor(category, requestedTarget);
+  let singlePdfImagePage = false;
+  if (category === "pdf" && config.pdfImageTargets.includes(requestedTarget)) {
+    const pdf = await PDFDocument.load(await fsp.readFile(file.path), { ignoreEncryption: true });
+    singlePdfImagePage = pdf.getPageCount() === 1;
+    if (singlePdfImagePage) outputExt = requestedTarget;
+  }
   const outputPath = outputPathFor(originalName, requestedTarget, outputExt);
   const downloadName = outputNameFor(originalName, requestedTarget, outputExt);
   let conversionResult = { warnings: [] };
@@ -507,7 +513,8 @@ app.post("/api/convert", assertLocalWebRequest, upload.single("file"), async (re
     } else if (category === "pdf") {
       await convertPdf(file.path, outputPath, requestedTarget, {
         pdfAction: String(req.body?.pdfAction || ""),
-        password: String(req.body?.password || "")
+        password: String(req.body?.password || ""),
+        singleImagePage: singlePdfImagePage
       });
     } else if (category === "zip") {
       await convertZipImagesToPdf(file.path, outputPath);

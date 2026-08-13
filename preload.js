@@ -1,6 +1,9 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("flyingMouseFormat", {
+  getSourcePath(file) {
+    return webUtils.getPathForFile(file);
+  },
   getSettings() {
     return ipcRenderer.invoke("get-settings");
   },
@@ -18,6 +21,12 @@ contextBridge.exposeInMainWorld("flyingMouseFormat", {
   },
   saveConvertedFiles(payload) {
     return ipcRenderer.invoke("save-converted-files", payload);
+  },
+  saveConvertedFileNextToSource(payload) {
+    return ipcRenderer.invoke("save-converted-file-next-to-source", payload);
+  },
+  revealConvertedFile(filePath) {
+    return ipcRenderer.invoke("reveal-converted-file", { filePath });
   },
   log(level, message) {
     return ipcRenderer.invoke("log-event", { level, message });

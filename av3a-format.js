@@ -153,7 +153,7 @@ async function resolveDecoderPath(explicitPath) {
       // Try the next bundled/development location.
     }
   }
-  throw new Error("缺少 AV3A 解码组件（avs3RM0Decoder.exe 或 model.bin）。请重新安装完整版本的飞鼠格式。");
+  throw new Error("缺少 AV3A 解码组件（avs3RM0Decoder.exe 或 model.bin）。请重新安装完整版本的走地猫。");
 }
 
 async function decoderWorkingDirectory(decoderPath) {

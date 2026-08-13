@@ -6,12 +6,12 @@ const { pathToFileURL } = require("node:url");
 
 const MESSAGES = {
   OFFICE_ENGINE_MISSING: {
-    zhCN: "缺少 LibreOffice 文档转换引擎，请重新安装完整版本的飞鼠格式。",
-    enUS: "The LibreOffice document engine is missing. Reinstall the complete FlyingMouse Format package."
+    zhCN: "缺少 LibreOffice 文档转换引擎，请重新安装完整版本的走地猫。",
+    enUS: "The LibreOffice document engine is missing. Reinstall the complete GroundCat package."
   },
   OFFICE_ENGINE_INCOMPATIBLE: {
-    zhCN: "当前 LibreOffice 引擎与系统不兼容，请安装适用于此系统的飞鼠格式版本。",
-    enUS: "The bundled LibreOffice engine is incompatible with this system. Install the matching FlyingMouse Format build."
+    zhCN: "当前 LibreOffice 引擎与系统不兼容，请安装适用于此系统的走地猫版本。",
+    enUS: "The bundled LibreOffice engine is incompatible with this system. Install the matching GroundCat build."
   },
   OFFICE_ENGINE_PROFILE_FAILED: {
     zhCN: "LibreOffice 无法创建独立用户配置，请检查临时目录权限或安全软件拦截。",
