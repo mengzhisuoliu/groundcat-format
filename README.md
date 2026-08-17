@@ -16,7 +16,7 @@
 
 感谢原作者 **LaoFeng（LaoFeng-mouse）** 开源完整的离线转换核心与工程基础。走地猫保留其核心转换能力，在此基础上重新设计了产品名称、视觉界面、安装体验和结果保存流程。本项目是独立的社区衍生版本，不代表原作者官方发布。
 
-原项目与本项目均遵循 [MIT License](LICENSE)。原作者版权声明和许可文本完整保留，更多说明见 [NOTICE.md](NOTICE.md)。
+走地猫基于 FlyingMouse Format v0.5.0 及其当时以 MIT License 发布的历史版本构建（版本与提交记录见 [NOTICE.md](NOTICE.md)）。FlyingMouse 后续已变更许可证；走地猫的 [MIT License](LICENSE) 仅适用于上述历史 MIT 版本代码及走地猫自身的贡献，不适用于 FlyingMouse 后续版本。原作者版权声明和许可文本完整保留。
 
 ## v0.1.0
 
@@ -57,4 +57,4 @@ Many thanks to the original author for open-sourcing the conversion core and pro
 
 Converted files are saved automatically next to their source files. Existing files are never overwritten. Single-page PDFs export directly to PNG/JPG, while multi-page image exports remain ZIP archives so no pages are lost.
 
-Licensed under the [MIT License](LICENSE). See [NOTICE.md](NOTICE.md) for attribution.
+GroundCat is built on FlyingMouse Format v0.5.0 and its historical releases published under the MIT License at that time (version and commit records in [NOTICE.md](NOTICE.md)). FlyingMouse has since changed its license; GroundCat's [MIT License](LICENSE) applies only to the code of those historical MIT releases and to GroundCat's own contributions, and does not apply to later FlyingMouse releases. The upstream author's copyright and permission notice are fully preserved.
